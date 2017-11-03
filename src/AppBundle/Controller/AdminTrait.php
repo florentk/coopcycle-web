@@ -24,7 +24,7 @@ trait AdminTrait
             $date = new \DateTime($tab);
         }
 
-        $orders = $orderRepo->getWaitingOrdersForRestaurant($restaurant, $date);
+        $orders = $orderRepo->getWaitingOrdersForRestaurant($restaurant);
         $history = $orderRepo->getHistoryOrdersForRestaurant($restaurant);
 
         $ordersJson = [];
@@ -35,9 +35,9 @@ trait AdminTrait
         return [
             'restaurant' => $restaurant,
             'restaurant_json' => $this->get('serializer')->serialize($restaurant, 'jsonld'),
-            'orders' => $orders,
             'history' => $history,
-            'orders_json' => '[' . implode(',', $ordersJson) . ']',
+            'orders' => $orders,
+            'orders_json' => '[' . implode(',', $ordersJson) . ']', // FIXME This is ugly...
             'restaurants_route' => $routes['restaurants'],
             'restaurant_route' => $routes['restaurant'],
             'routes' => $routes,

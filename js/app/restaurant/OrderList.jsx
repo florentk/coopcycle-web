@@ -1,5 +1,5 @@
 import React from 'react';
-import OrderListItem from './OrderListItem.jsx';
+import OrderLabel from '../order/Label.jsx';
 import _ from 'lodash';
 import moment from 'moment';
 
@@ -12,14 +12,51 @@ class OrderList extends React.Component
     };
   }
   addOrder(order) {
+
+    console.log(order);
+
     let { orders } = this.state;
     orders.push(order);
 
     this.setState({ orders });
   }
+
+  renderOrders(date, orders) {
+    return (
+      <div key={ date }>
+        <h3>{ moment(date).calendar().split(' ')[0] }</h3>
+        { this.renderOrdersTable(orders) }
+      </div>
+    )
+  }
+
+  renderOrdersTable(orders) {
+    return (
+      <div>
+        <table className="table">
+          <tbody>
+          { _.map(orders, (order) => this.renderOrderRow(order)) }
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
+  renderOrderRow(order) {
+    return (
+      <tr key={ order['@id'] } onClick={ () => this.props.onOrderClick(order) } style={{ cursor: 'pointer' }}>
+        <td>#{ order['@id'].replace('/api/orders/', '') }</td>
+        <td><OrderLabel order={ order } /></td>
+        <td><i className="fa fa-clock-o" aria-hidden="true"></i>  { moment(order.delivery.date).format('lll') }</td>
+        <td>{ order.total } €</td>
+        <td className="text-right">{ order.customer.username }</td>
+      </tr>
+    )
+  }
+
   render() {
 
-    let { orders } = this.state;
+    const { orders } = this.state
 
     if (orders.length === 0) {
       return (
@@ -27,29 +64,26 @@ class OrderList extends React.Component
       )
     }
 
-    orders.sort((a, b) => {
-      const dateA = moment(a.delivery.date);
-      const dateB = moment(b.delivery.date);
-      if (dateA === dateB) {
-        return 0;
-      }
+    const deliveryDate = order => moment(order.delivery.date).format('YYYY-MM-DD')
+    const ordersByDate = _.mapValues(_.groupBy(orders, deliveryDate), orders => {
+      orders.sort((a, b) => {
+        const dateA = moment(a.delivery.date);
+        const dateB = moment(b.delivery.date);
+        if (dateA === dateB) {
+          return 0;
+        }
 
-      return dateA.isAfter(dateB) ? 1 : -1;
-    });
+        return dateA.isAfter(dateB) ? 1 : -1;
+      });
 
-    var items = _.map(orders, (order, key) => {
-      return (
-        <OrderListItem
-          key={key}
-          order={order} />
-      );
-    });
+      return orders
+    })
 
     return (
       <div>
-        {items}
+      { _.map(ordersByDate, (orders, date) => this.renderOrders(date, orders)) }
       </div>
-    );
+    )
   }
 }
 

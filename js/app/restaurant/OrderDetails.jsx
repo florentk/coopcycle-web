@@ -1,24 +1,31 @@
 import React from 'react';
-import moment from 'moment';
 import OrderLabel from '../order/Label.jsx';
+import _ from 'lodash';
+import moment from 'moment';
 
 moment.locale($('html').attr('lang'));
 
-const routes = window.__routes;
+class OrderList extends React.Component {
 
-class OrderListItem extends React.Component
-{
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      order: null
+    };
+  }
+
   resolveOrderRoute(route) {
-    const order = this.props.order;
+    const order = this.state.order;
     const id = order['@id'].replace('/api/orders/', '');
 
-    return routes[route].replace('__ORDER_ID__', id)
+    return this.props.routes[route].replace('__ORDER_ID__', id)
   }
 
   resolveUserRoute(route) {
-    const customer = this.props.order.customer;
+    const customer = this.state.order.customer;
 
-    return routes[route].replace('__USERNAME__', customer.username)
+    return this.props.routes[route].replace('__USERNAME__', customer.username)
   }
 
   renderWaitingButtons() {
@@ -63,62 +70,67 @@ class OrderListItem extends React.Component
     )
   }
 
+  setOrder(order) {
+    this.setState({ order })
+  }
+
+  renderOrderItems() {
+    return (
+      <table className="table table-condensed">
+        <tbody>
+          { this.state.order.orderedItem.map((item, key) =>
+            <tr key={ key }>
+              <td>{ item.quantity } x { item.name }</td>
+              <td className="text-right">{ item.quantity * item.price } €</td>
+            </tr>
+          ) }
+          <tr>
+            <td><strong>Total</strong></td>
+            <td className="text-right"><strong>{ this.state.order.total } €</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    )
+  }
+
   render() {
 
-    const order = this.props.order;
-    const id = order['@id'].replace('/api/orders/', '');
+    const { order } = this.state
 
-    let classNames = [
-      'panel',
-      'panel-default'
-    ];
-
-    if (order.status === 'ACCEPTED') {
-      classNames.push('panel-success')
+    if (!order) {
+      return (
+        <div className="alert alert-info">Click on an order to display details</div>
+      )
     }
 
     return (
-      <div className={ classNames.join(' ') }>
+      <div className="panel panel-default">
         <div className="panel-heading">
-          <h3 className="panel-title"><a href={ this.resolveOrderRoute('order_details') }>Commande #{ id }</a></h3>
+          <h3 className="panel-title">Order #{ order['@id'].replace('/api/orders/', '') }</h3>
         </div>
         <div className="panel-body">
-          <p className="text-right"><OrderLabel order={ order } /></p>
-          <p className="text-right">
-            <a href={ this.resolveUserRoute('user_details') }>
-            { order.customer.username }  <i className="fa fa-user" aria-hidden="true"></i>
-            </a>
+          <p>
+            <span className="text-left"><OrderLabel order={ order } /></span>
+            <strong className="pull-right text-success">
+                { moment(order.delivery.date).format('lll') }  <i className="fa fa-clock-o" aria-hidden="true"></i>
+            </strong>
           </p>
           { order.customer.telephone &&
           <p className="text-right">{ order.customer.telephone }  <i className="fa fa-phone" aria-hidden="true"></i></p> }
-          <p className="text-right">{ moment(order.createdAt).fromNow() }  <i className="fa fa-calendar" aria-hidden="true"></i></p>
-
-          <table className="table table-condensed">
-            <tbody>
-              { order.orderedItem.map((item, key) =>
-                <tr key={ key }>
-                  <td>{ item.quantity } x { item.name }</td>
-                  <td className="text-right">{ item.quantity * item.price } €</td>
-                </tr>
-              ) }
-              <tr>
-                <td><strong>Total</strong></td>
-                <td className="text-right"><strong>{ order.total } €</strong></td>
-              </tr>
-            </tbody>
-          </table>
-
           <p className="text-right">
-            <i className="fa fa-clock-o" aria-hidden="true"></i>  { moment(order.delivery.date).format('lll') }
+            <a href={ this.resolveUserRoute('user_details') }>
+              { order.customer.username }  <i className="fa fa-user" aria-hidden="true"></i>
+            </a>
           </p>
-
+          <h4>Dishes</h4>
+          { this.renderOrderItems() }
+          <hr />
           { order.status === 'WAITING' && this.renderWaitingButtons() }
           { order.status === 'ACCEPTED' && this.renderAcceptedButtons() }
-
         </div>
       </div>
-    );
+    )
   }
 }
 
-module.exports = OrderListItem;
+module.exports = OrderList;

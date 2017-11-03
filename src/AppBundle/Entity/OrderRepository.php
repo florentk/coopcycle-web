@@ -8,25 +8,34 @@ use Doctrine\ORM\Query\Expr;
 
 class OrderRepository extends EntityRepository
 {
-    public function getWaitingOrdersForRestaurant(Restaurant $restaurant, \DateTime $date = null)
+    public function getWaitingOrdersForRestaurant(Restaurant $restaurant, \DateTime $now = null)
     {
+        if (null === $now) {
+            $now = new \DateTime();
+        }
+
         $qb = $this->createQueryBuilder('o');
         $qb
             ->join(Delivery::class, 'd', Expr\Join::WITH, 'd.order = o.id')
             ->andWhere('o.restaurant = :restaurant')
             ->andWhere($qb->expr()->in('o.status', [
                 Order::STATUS_WAITING,
-                Order::STATUS_ACCEPTED
+                Order::STATUS_ACCEPTED,
+                Order::STATUS_REFUSED
             ]))
+            ->andWhere('d.date >= :date')
             ->setParameter('restaurant', $restaurant)
+            ->setParameter('date', $now)
             ->orderBy('d.date', 'ASC')
             ;
 
-        if ($date) {
-            $qb
-                ->andWhere('DATE(d.date) = :date')
-                ->setParameter('date', $date->format('Y-m-d'));
-        }
+        // if ($date) {
+        //     $qb
+        //         ->andWhere('DATE(d.date) = :date')
+        //         ->setParameter('date', $date->format('Y-m-d'));
+        // }
+
+        // var_dump($qb->getQuery()->getSQL());
 
         return $qb->getQuery()->getResult();
     }
