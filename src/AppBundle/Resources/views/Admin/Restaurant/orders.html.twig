@@ -11,8 +11,8 @@
 {% set current_route = app.request.attributes.get('_route') %}
 {% set current_route_params = app.request.attributes.get('_route_params') %}
 
-<div class="row">
-  <div class="col-md-7">
+<div class="restaurant-dashboard">
+  <div class="restaurant-dashboard__list">
     {# <div class="well well-sm"><strong>{% trans %}Waiting{% endtrans %}</strong></div> #}
     {# <ul class="nav nav-justified nav-pills">
       <li role="presentation" {% if tab == 'today' %}class="active"{% endif %}>
@@ -29,7 +29,7 @@
     <hr> #}
     <div id="order-list"></div>
   </div>
-  <div class="col-md-5">
+  <div class="restaurant-dashboard__details">
     {# <div class="well well-sm"><strong>{% trans %}History{% endtrans %}</strong></div> #}
     {# <table class="table table-condensed">
       <tbody>
@@ -65,6 +65,7 @@ window.__order_status_i18n = {
 window.__restaurant = {{ restaurant_json|raw }};
 window.__restaurant = {{ restaurant_json|raw }};
 window.__orders = {{ orders_json|raw }};
+window.__order = {{ order_json|raw }};
 window.__routes = {
   'order_accept':  "{{ path(routes.order_accept,  { id: '__ORDER_ID__' }) }}",
   'order_refuse':  "{{ path(routes.order_refuse,  { id: '__ORDER_ID__' }) }}",

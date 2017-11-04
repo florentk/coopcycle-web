@@ -22,13 +22,18 @@ setTimeout(function() {
 orderList = render(
   <OrderList
     orders={ window.__orders }
+    active={ window.__order }
     i18n={ window.__i18n }
-    onOrderClick={ (order) => orderDetails.setOrder(order) } />,
+    onOrderClick={ (order) => {
+      orderList.setActive(order)
+      orderDetails.setOrder(order)
+    } } />,
   document.getElementById('order-list')
 );
 
 orderDetails = render(
   <OrderDetails
+    order={ window.__order }
     routes={ window.__routes }
     i18n={ window.__i18n } />,
   document.getElementById('order-details')

@@ -392,3 +392,21 @@ form[name="menu"] {
         margin-left: 5px;
     }
 }
+
+.restaurant-dashboard {
+    display: flex;
+    height: 500px;
+    &__list {
+        flex: 1;
+        padding-right: 15px;
+    }
+    &__details {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        padding-left: 15px;
+        > div {
+            flex: 1;
+        }
+    }
+}

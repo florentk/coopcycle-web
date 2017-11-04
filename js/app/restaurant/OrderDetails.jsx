@@ -11,7 +11,7 @@ class OrderList extends React.Component {
     super(props);
 
     this.state = {
-      order: null
+      order: props.order
     };
   }
 

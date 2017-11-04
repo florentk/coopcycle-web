@@ -6,19 +6,25 @@ import moment from 'moment';
 class OrderList extends React.Component
 {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       orders: props.orders,
-    };
+      active: props.active
+    }
   }
+
+  setActive(order) {
+    this.setState({ active: order })
+  }
+
   addOrder(order) {
 
     console.log(order);
 
-    let { orders } = this.state;
-    orders.push(order);
+    let { orders } = this.state
+    orders.push(order)
 
-    this.setState({ orders });
+    this.setState({ orders })
   }
 
   renderOrders(date, orders) {
@@ -33,7 +39,7 @@ class OrderList extends React.Component
   renderOrdersTable(orders) {
     return (
       <div>
-        <table className="table">
+        <table className="table table-hover">
           <tbody>
           { _.map(orders, (order) => this.renderOrderRow(order)) }
           </tbody>
@@ -43,8 +49,14 @@ class OrderList extends React.Component
   }
 
   renderOrderRow(order) {
+
+    let className = ''
+    if (this.state.active && this.state.active['@id'] === order['@id']) {
+      className = 'active'
+    }
+
     return (
-      <tr key={ order['@id'] } onClick={ () => this.props.onOrderClick(order) } style={{ cursor: 'pointer' }}>
+      <tr key={ order['@id'] } onClick={ () => this.props.onOrderClick(order) } style={{ cursor: 'pointer' }} className={ className }>
         <td>#{ order['@id'].replace('/api/orders/', '') }</td>
         <td><OrderLabel order={ order } /></td>
         <td><i className="fa fa-clock-o" aria-hidden="true"></i>  { moment(order.delivery.date).format('lll') }</td>
