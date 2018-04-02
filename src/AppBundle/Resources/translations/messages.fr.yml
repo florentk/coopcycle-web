@@ -350,8 +350,8 @@ roles.ROLE_STORE: Magasin
 roles.ROLE_USER: Utilisateur
 
 user.edit.roles.help: Configurez les autorisations de l'utilisateur <a href="%link%">En savoir plus</a>
-user.profile.familyName: Nom
-user.profile.givenName: Prénom
+user.familyName: Nom
+user.givenName: Prénom
 
 roles.ROLE_ADMIN.help: |
   Administrateur : Accès total à toutes les fonctions
