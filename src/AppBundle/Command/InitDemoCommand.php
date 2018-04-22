@@ -159,6 +159,13 @@ class InitDemoCommand extends ContainerAwareCommand
             $mapsCenter = $this->createCraueConfigSetting('latlng', '48.857498,2.335402');
             $em->persist($mapsCenter);
         }
+        
+        try {
+            $this->craueConfig->get('brand_name');
+        } catch (\RuntimeException $e) {
+            $brandName = $this->createCraueConfigSetting('brand_name', 'CoopCycle');
+            $em->persist($brandName);
+        }        
 
         try {
             $this->craueConfig->get('google_api_key');
